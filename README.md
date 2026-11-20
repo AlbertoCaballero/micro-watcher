@@ -1,19 +1,26 @@
 # micro-watcher
 
-A local-first screen-time tracker for Linux, written in Python. It records the
-focused application, pauses when you are idle (unless media is playing), and
-prints daily or weekly reports from a local CSV store.
+**Local-first screen-time tracking for Linux — no cloud, no telemetry, no root.**
 
-This fork stays on Python 3; the upstream Go migration branch is not used here.
-It currently targets **GNOME Wayland** and **X11**, with KDE and wlroots
-backends planned.
+micro-watcher records the application you are actually using, pauses when you
+are idle, and prints daily or weekly reports from data that stays on your
+machine. It works on **X11** today and on **GNOME Wayland 45+** through a small,
+auditable Shell extension. KDE and wlroots backends are next.
 
-## Status
+> Development snapshot: GNOME Wayland and X11 tracking are implemented. Browser
+> tracking, background media reporting, KDE/wlroots, durable storage, and
+> distribution packages are planned, not yet released.
 
-Development snapshot. The GNOME Wayland backend, safety fixes, and user-local
-installer are implemented; distro packages and browser tracking are not yet
-published. See [`agents/OUTLINE.md`](agents/OUTLINE.md) for the design and
-[`agents/BACKLOG.md`](agents/BACKLOG.md) for the ordered work plan.
+## Highlights
+
+- **Local by design** — plain files under `~/.cache/Watcher`; no accounts, no
+  network calls, no telemetry.
+- **Works where the desktop is going** — native GNOME Wayland support via a
+  user-level extension, with the existing X11 backend preserved.
+- **Honest reports** — focused-window time and AFK handling, with daily and
+  weekly breakdowns per application.
+- **No root, no surprises** — the installer writes only to your home directory
+  and never edits shell startup files.
 
 ## Features
 
@@ -22,14 +29,13 @@ published. See [`agents/OUTLINE.md`](agents/OUTLINE.md) for the design and
 - Idle detection via `xprintidle` on X11 and Mutter's `IdleMonitor` on Wayland.
 - Media-aware idle handling through `pactl` (PulseAudio/PipeWire).
 - Local-only data; no network calls or telemetry.
-- User-local installation with no `sudo`, no downloaded installer, and no
-  edits to shell startup files.
+- User-local installation with no `sudo` and no downloaded installer.
 
 Planned:
 
 - KDE Wayland and wlroots backends.
-- Browser domain tracking (focused tab only) with a separate **background media**
-  metric; no URLs, page titles, history, or page content.
+- Browser domain tracking for the focused tab, plus a separate **background
+  media** report (site, browser, duration) that never counts as screen time.
 - Crash-safe storage and migration from the current CSVs.
 - A systemd user service.
 - AUR and Debian/Ubuntu packages.
@@ -39,14 +45,14 @@ Planned:
 | Platform | Window tracking | Idle tracking | Status |
 | --- | --- | --- | --- |
 | X11 | `xdotool` + `xprop` | `xprintidle` | Supported |
-| GNOME Wayland 45+ | GNOME Shell extension (`gdbus`) | Mutter `IdleMonitor` | Supported; one re-login after install |
+| GNOME Wayland 45–51 | GNOME Shell extension (`gdbus`) | Mutter `IdleMonitor` | Supported; one re-login after install |
 | KDE Wayland | KWin plugin (planned) | Compositor idle API (planned) | Planned |
 | wlroots (Sway/Hyprland) | `swaymsg` / `hyprctl` (planned) | Compositor idle API (planned) | Planned |
 | GNOME < 45 | — | — | Not supported |
 | Windows/macOS | — | — | Not planned |
 
-The current GNOME test environment is GNOME Shell 51.1 on Wayland. X11 support
-is preserved in code but is not exercised on that machine.
+Tested on GNOME Shell 51.1 with Wayland. X11 support is preserved in code but is
+not exercised on that machine.
 
 ## Requirements
 
@@ -57,27 +63,37 @@ is preserved in code but is not exercised on that machine.
 - **Optional:** `pactl` from PulseAudio or PipeWire for media-aware AFK
   detection.
 
-Arch-based systems (X11 only):
+Arch-based systems:
 
 ```bash
-sudo pacman -S xdotool xprintidle x11-utils
+# GNOME Wayland
+sudo pacman -S --needed git python
+
+# X11 additionally needs:
+sudo pacman -S --needed xdotool xprintidle x11-utils
 ```
 
-Debian/Ubuntu (X11 only):
+Debian/Ubuntu:
 
 ```bash
+sudo apt update
+sudo apt install git python3
+
+# X11 additionally needs:
 sudo apt install xdotool xprintidle x11-utils
 ```
+
+Debian 12 (Python 3.11) and Ubuntu 24.04+ (Python 3.12) are supported. Ubuntu
+22.04 ships Python 3.10 and is not supported.
 
 Package-manager installation of micro-watcher itself is not available yet; see
 [Distribution](#distribution).
 
 ## Installation
 
-### From this checkout
-
 ```bash
-# Clone the repository, then from its root:
+git clone https://github.com/AlbertoCaballero/micro-watcher.git
+cd micro-watcher
 ./install
 ```
 
@@ -91,9 +107,10 @@ The installer:
 It does **not** use `sudo`, download code, or edit `~/.xprofile` /
 `~/.xinitrc`.
 
-If `~/.local/bin` is not on `PATH`:
+If `~/.local/bin` is not on `PATH`, add it to your shell configuration:
 
 ```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc   # or ~/.bashrc
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
@@ -120,14 +137,17 @@ message instead of recording incorrect data.
 
 ### Uninstall
 
+From the checkout:
+
 ```bash
+cd micro-watcher
 ./uninstall
 ```
 
-This removes the launcher, the user-local installation, and the GNOME extension.
-Recorded data in `~/.cache/Watcher` is kept unless you explicitly confirm
-deletion. A legacy system-wide install, if present, is reported for manual
-removal.
+This removes the launcher, the user-local installation, and the GNOME
+extension. Recorded data in `~/.cache/Watcher` is kept unless you explicitly
+confirm deletion. A legacy system-wide install, if present, is reported for
+manual removal.
 
 ## Usage
 
@@ -144,6 +164,8 @@ micro-watcher --start          # record until Ctrl+C
 
 Dates use `YYYY-MM-DD`; weeks use `Www-YYYY` (ISO week and ISO year). Invalid
 values are rejected before any file or command is touched.
+
+Reports only include time recorded while `micro-watcher --start` is running.
 
 ## Data and privacy
 

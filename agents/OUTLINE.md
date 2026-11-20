@@ -318,7 +318,7 @@ These are genuine forks in the road. The backlog assumes the recommended default
 
 | ID | Decision | Recommended default | Impact if changed |
 | --- | --- | --- | --- |
-| D1 | **Python or Go?** | **Confirmed:** continue in Python. The Go migration branch is out of scope for this effort. | Revisit only if someone commits to maintaining a parallel Go port. |
+| D1 | **Language** | **Confirmed:** Python 3.11+. | A second implementation in another language is out of scope for the current effort. |
 | D2 | **Distribution and command names** | **Confirmed:** distribution `micro-watcher`; import package `micro_watcher` (underscores are required in Python); command `micro-watcher`; service `micro-watcher.service`. | Check PyPI availability before publishing; renaming later breaks scripts and docs. Legacy data under `~/.cache/Watcher` stays readable until migration. |
 | D3 | **Backend priority and plugin location** | **Confirmed:** GNOME Wayland first, then KDE, then wlroots; X11 preserved. Keep compositor plugins in this repo under `extensions/gnome/` and `extensions/kde/`; the Python daemon remains the core. | GNOME focus tracking needs a Shell extension and KDE needs a KWin script/QML; both add version-specific JS/QML and packaging work, but no separate language runtime beyond the compositor's own JS engine. |
 | D4 | **Storage compatibility** | Preserve history: migrate existing CSVs, keep CSV export. | A clean break is simpler but loses users' existing reports unless they migrate manually. |
@@ -335,7 +335,6 @@ These are genuine forks in the road. The backlog assumes the recommended default
 - GUI/Tauri frontend (the README's "300 stars" idea) — separate project, blocked on a stable backend/storage layer.
 - Cloud sync, accounts, or remote telemetry — conflicts with the local-first privacy model.
 - Windows/macOS support — different window/idle APIs; out of scope for this outline.
-- Rewriting the project in Go — see D1; not part of the Python backlog.
 
 ---
 

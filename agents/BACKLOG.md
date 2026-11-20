@@ -613,7 +613,7 @@
 ### MW-035 — Rewrite the README and platform documentation
 
 - [ ] **Scope**
-  - **Partial 2026-11-20:** README rewritten for current features, GNOME/X11 support, privacy, installation/uninstall, and the AUR/.deb roadmap; obsolete gallery/HACTOBERFEST/Go content removed. Final verification after KDE/browser/package work remains.
+  - **Partial 2026-11-20:** README rewritten for current features, GNOME/X11 support, privacy, installation/uninstall, and the AUR/.deb roadmap; obsolete gallery/HACTOBERFEST content removed. Final verification after KDE/browser/package work remains.
   - **Size:** M · **Depends on:** MW-020, MW-027, MW-034 · **Outline:** O-9
   - **Why now:** M0 fixed the unsafe install command and basic command names, but the README still lacks a verified support matrix, migration/privacy details, browser setup, and troubleshooting. Docs are the install path for most users.
   - **Work:**
@@ -764,7 +764,6 @@ Do not start these until the release above exists:
 - Additional browser integrations (Safari, mobile browsers) or editor plugins.
 - Automatic app categorization / machine learning.
 - Windows or macOS backends.
-- Go rewrite (see D1).
 
 ---
 

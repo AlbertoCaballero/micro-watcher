@@ -111,7 +111,7 @@ def test_yesterday_alias_uses_python_date_math(tmp_path):
     result = run_cli(tmp_path, "-ds", "--yesterday")
 
     assert result.returncode == 0
-    assert "Yestarday's Screen-Time" in result.stdout
+    assert "Yesterday's Screen-Time" in result.stdout
 
 
 def test_previous_week_alias_uses_python_date_math(tmp_path):

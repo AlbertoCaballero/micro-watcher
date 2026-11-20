@@ -6,6 +6,14 @@ import micro_watcher.analysis as anls
 import micro_watcher.time_operations as to
 from micro_watcher.validation import validate_date, validate_week
 
+def _ordinal(number):
+    if 10 <= number % 100 <= 20:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(number % 10, "th")
+    return f"{number}{suffix}"
+
+
 class Color:
 
     def GREY(text):
@@ -50,11 +58,11 @@ def daily_summary(date = get_date()):
             print(Color.YELLOW("\n   Today's Screen-Time\t\t   ") + Color.BLUE(to.format_time(Total_screen_time)))
     elif date == (datetime.date.today() - datetime.timedelta(days=1)).isoformat():
         if len(to.format_time(Total_screen_time)) == 3:
-            print(Color.YELLOW("\n   Yestarday's Screen-Time\t   ") + Color.BLUE(f'{to.format_time(Total_screen_time):>16}'))
+            print(Color.YELLOW("\n   Yesterday's Screen-Time\t   ") + Color.BLUE(f'{to.format_time(Total_screen_time):>16}'))
         elif len(to.format_time(Total_screen_time)) == 7:
-            print(Color.YELLOW("\n   Yestarday's Screen-Time\t   ") + Color.BLUE(f'{to.format_time(Total_screen_time):>11}'))
+            print(Color.YELLOW("\n   Yesterday's Screen-Time\t   ") + Color.BLUE(f'{to.format_time(Total_screen_time):>11}'))
         elif len(to.format_time(Total_screen_time)) == 11:
-            print(Color.YELLOW("\n   Yestarday's Screen-Time\t   ") + Color.BLUE(to.format_time(Total_screen_time)))
+            print(Color.YELLOW("\n   Yesterday's Screen-Time\t   ") + Color.BLUE(to.format_time(Total_screen_time)))
     else:
         if len(to.format_time(Total_screen_time)) == 3:
             print(Color.YELLOW("\n   "+date+"'s Screen-Time\t   ") + Color.BLUE(f'{to.format_time(Total_screen_time):>6}'))
@@ -98,7 +106,7 @@ def week_summary(week=None):
         print(Color.PURPLE("\n   Previous Week's \t\t   ") + Color.BLUE(to.format_time(week_screen_time)))
         print(Color.PURPLE("     Screen-Time"))
     else:
-        print(Color.PURPLE("\n     "+week[1:3]+ "th week of\t   ") + Color.BLUE(to.format_time(week_screen_time)))
+        print(Color.PURPLE("\n     " + _ordinal(int(week[1:3])) + " week of\t   ") + Color.BLUE(to.format_time(week_screen_time)))
         print(Color.PURPLE("   "+week[4:] +" screen-time\t    "))
 
     print(" ────────────────────────────────────────────────")
